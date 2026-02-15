@@ -27,7 +27,12 @@ dotnet run --project TodoDS.csproj
 - Autostart registry key: `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` (value `TodoDS`)
 
 ## Screenshots
-- TODO
+### Settings
+![Settings Window](pictures/Setting_pic.png)
+
+### Top Window
+![Top Window 1](pictures/TopWindow_pic1.png)
+![Top Window 2](pictures/TopWindow_pic2.png)
 
 ## License
 MIT
