@@ -71,6 +71,7 @@
                               Background="Transparent"
                               BorderThickness="0"
                               SelectedItemChanged="TodoTree_OnSelectedItemChanged"
+                              PreviewMouseLeftButtonDown="TodoTree_OnPreviewMouseLeftButtonDown"
                               PreviewMouseRightButtonDown="TodoItem_OnPreviewMouseRightButtonDown">
                         <TreeView.ItemContainerStyle>
                             <Style TargetType="TreeViewItem">

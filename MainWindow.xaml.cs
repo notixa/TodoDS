@@ -1,6 +1,7 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -208,6 +209,42 @@ public partial class MainWindow : Window
         }
     }
 
+    private void TodoTree_OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.OriginalSource is not DependencyObject source)
+        {
+            return;
+        }
+
+        if (FindAncestor<TreeViewItem>(source) != null)
+        {
+            return;
+        }
+
+        if (FindAncestor<ScrollBar>(source) != null)
+        {
+            return;
+        }
+
+        ClearSelection();
+    }
+
+    private void ClearSelection()
+    {
+        if (_selected == null)
+        {
+            return;
+        }
+
+        var container = FindContainer(TodoTree, _selected);
+        if (container != null)
+        {
+            container.IsSelected = false;
+        }
+
+        _selected = null;
+    }
+
     private void FocusTitleEditor(TodoItem item)
     {
         Dispatcher.BeginInvoke(
@@ -251,6 +288,22 @@ public partial class MainWindow : Window
             {
                 return result;
             }
+        }
+
+        return null;
+    }
+
+    private static T? FindAncestor<T>(DependencyObject source) where T : DependencyObject
+    {
+        var current = source;
+        while (current != null)
+        {
+            if (current is T match)
+            {
+                return match;
+            }
+
+            current = VisualTreeHelper.GetParent(current);
         }
 
         return null;
