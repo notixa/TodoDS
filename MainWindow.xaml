@@ -1,0 +1,204 @@
+<Window x:Class="TodoDS.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:TodoDS"
+        Title="Todo 设置"
+        Width="560"
+        Height="520"
+        Background="{StaticResource BrushSurface}"
+        FontFamily="Segoe UI"
+        FontSize="13"
+        WindowStartupLocation="CenterScreen">
+    <Window.CommandBindings>
+        <CommandBinding Command="{x:Static local:MainWindow.RenameCommand}" Executed="RenameCommand_OnExecuted" />
+        <CommandBinding Command="{x:Static local:MainWindow.EditTimeCommand}" Executed="EditTimeCommand_OnExecuted" />
+        <CommandBinding Command="{x:Static local:MainWindow.DeleteCommand}" Executed="DeleteCommand_OnExecuted" />
+    </Window.CommandBindings>
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Margin="0,0,0,16">
+            <StackPanel>
+                <TextBlock Text="Todo 设置"
+                           FontSize="24"
+                           FontWeight="Bold"
+                           Foreground="{StaticResource BrushText}" />
+                <TextBlock Text="管理列表与待办"
+                           Foreground="{StaticResource BrushMuted}"
+                           Margin="0,2,0,0" />
+                <Border Height="3"
+                        Width="36"
+                        Background="{StaticResource BrushAccent}"
+                        CornerRadius="2"
+                        Margin="0,10,0,0" />
+            </StackPanel>
+        </Grid>
+
+        <Border Grid.Row="1" Style="{StaticResource CardBorder}" Padding="12">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0"
+                        Background="#F7F9FD"
+                        BorderBrush="#E5EAF3"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="10"
+                        Margin="0,0,0,10">
+                    <StackPanel>
+                        <TextBlock Text="待办列表"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource BrushText}" />
+                        <TextBlock Text="在下方添加待办或列表，右键条目可编辑或删除"
+                                   Foreground="{StaticResource BrushMuted}" />
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Row="1"
+                        Background="#FDFEFF"
+                        BorderBrush="#E6EDF7"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="6">
+                    <TreeView x:Name="TodoTree"
+                              Background="Transparent"
+                              BorderThickness="0"
+                              SelectedItemChanged="TodoTree_OnSelectedItemChanged"
+                              PreviewMouseRightButtonDown="TodoItem_OnPreviewMouseRightButtonDown">
+                        <TreeView.ItemContainerStyle>
+                            <Style TargetType="TreeViewItem">
+                                <Setter Property="IsExpanded" Value="True" />
+                                <Setter Property="Margin" Value="0,0,0,8" />
+                                <Setter Property="Padding" Value="0" />
+                                <Setter Property="ContextMenu">
+                                    <Setter.Value>
+                                        <ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                                            <MenuItem Header="修改名称"
+                                                      Command="{x:Static local:MainWindow.RenameCommand}"
+                                                      CommandParameter="{Binding}" />
+                                            <MenuItem Header="修改时间"
+                                                      Command="{x:Static local:MainWindow.EditTimeCommand}"
+                                                      CommandParameter="{Binding}">
+                                                <MenuItem.Style>
+                                                    <Style TargetType="MenuItem">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsList}" Value="True">
+                                                                <Setter Property="IsEnabled" Value="False" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </MenuItem.Style>
+                                            </MenuItem>
+                                            <Separator />
+                                            <MenuItem Header="删除"
+                                                      Command="{x:Static local:MainWindow.DeleteCommand}"
+                                                      CommandParameter="{Binding}" />
+                                        </ContextMenu>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </TreeView.ItemContainerStyle>
+
+                        <TreeView.ItemTemplate>
+                            <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                                <Border Background="#FFF8FAFC"
+                                        BorderBrush="#FFE4EAF2"
+                                        BorderThickness="1"
+                                        CornerRadius="8"
+                                        Padding="10">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <CheckBox Grid.Column="0"
+                                                  Margin="0,2,8,0"
+                                                  IsChecked="{Binding Completed}"
+                                                  Click="CompletedCheck_OnClick">
+                                            <CheckBox.Style>
+                                                <Style TargetType="CheckBox">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsList}" Value="True">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </CheckBox.Style>
+                                        </CheckBox>
+
+                                        <StackPanel Grid.Column="1">
+                                            <TextBox x:Name="TitleEditor"
+                                                     Text="{Binding Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                     Background="Transparent"
+                                                     BorderThickness="0"
+                                                     Padding="0"
+                                                     Foreground="{StaticResource BrushText}"
+                                                     FontWeight="SemiBold"
+                                                     KeyDown="TitleEditor_OnKeyDown"
+                                                     LostFocus="TitleEditor_OnLostFocus" />
+                                            <TextBlock Text="{Binding Subtitle}"
+                                                       Foreground="{StaticResource BrushMuted}"
+                                                       FontSize="11" />
+                                        </StackPanel>
+
+                                        <Border Grid.Column="2"
+                                                Background="#FFEFF2F8"
+                                                CornerRadius="10"
+                                                Padding="6,2"
+                                                VerticalAlignment="Top"
+                                                Margin="8,2,0,0">
+                                            <TextBlock Text="列表"
+                                                       Foreground="{StaticResource BrushMuted}"
+                                                       FontSize="11" />
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsList}" Value="True">
+                                                            <Setter Property="Visibility" Value="Visible" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                        </Border>
+                                    </Grid>
+                                </Border>
+                            </HierarchicalDataTemplate>
+                        </TreeView.ItemTemplate>
+                    </TreeView>
+                </Border>
+
+                <Grid Grid.Row="2" Margin="0,12,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Button x:Name="AddListButton"
+                            Grid.Column="0"
+                            Content="新建列表"
+                            Style="{StaticResource SecondaryButton}"
+                            Height="40"
+                            HorizontalAlignment="Stretch"
+                            Click="AddListButton_OnClick" />
+                    <Button x:Name="AddTodoButton"
+                            Grid.Column="1"
+                            Content="新建待办"
+                            Style="{StaticResource PrimaryButton}"
+                            Height="40"
+                            HorizontalAlignment="Stretch"
+                            Margin="10,0,0,0"
+                            Click="AddTodoButton_OnClick" />
+                </Grid>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
